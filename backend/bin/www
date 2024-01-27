@@ -7,6 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
+const mongoose = require('mongoose');
+const { mongoURI: db } = require('../config/keys.js');
 
 /**
  * Get port from environment and store in Express.
@@ -21,11 +23,22 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
+mongoose
+  .connect(db)
+  .then(() => {
+    // Use `debug` instead of `dbLogger` if you did not split the debug 
+    // console into `dbLogger` and `serverLogger` above. 
+    debug("Connected to MongoDB successfully");
+    server.listen(port);
+  })
+  // Use `debug` instead of `serverLogger` if you did not split the debug 
+  // console into `dbLogger` and `serverLogger` above.
+  .catch(err => debug(err));
 /**
  * Listen on provided port, on all network interfaces.
  */
 // listen for requests on the specified port:
-server.listen(port);
+// server.listen(port);
 // failure callback when server has trouble starting:
 server.on('error', onError);
 // success callback when server starts:
